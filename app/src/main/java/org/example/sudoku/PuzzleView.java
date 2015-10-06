@@ -49,6 +49,15 @@ public class PuzzleView extends View {
     //ava end
    private final Rect selRect = new Rect();
 
+    private Paint background = new Paint();
+    private Paint dark = new Paint();
+    private Paint hilite = new Paint();
+    private Paint light = new Paint();
+    private Paint foreground = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint hint = new Paint();
+    private Rect loc_r = new Rect();
+    private Paint selected = new Paint();
+
    private final Game game;
    
    public PuzzleView(Context context) {
@@ -78,7 +87,7 @@ public class PuzzleView extends View {
       Bundle bundle = (Bundle) state;
       select(bundle.getInt(SELX), bundle.getInt(SELY));
       super.onRestoreInstanceState(bundle.getParcelable(VIEW_STATE));
-      return;
+      //return;
    }
    
 
@@ -88,8 +97,8 @@ public class PuzzleView extends View {
        fieldWidth  = w < h ? w : h;
        fieldHeight = w < h ? w : h;
 
-       offsetX = (int) ((w - fieldWidth) / 2);
-       offsetY = (int) ((h - fieldHeight) / 2);
+       offsetX = ((w - fieldWidth) / 2);
+       offsetY = ((h - fieldHeight) / 2);
 
        Log.d(TAG, "onSizeChanged: w " + w + ", h " + h);
        Log.d(TAG, "onSizeChanged: offsetX " + offsetX + ", offsetY " + offsetY);
@@ -108,37 +117,36 @@ public class PuzzleView extends View {
    @Override
    protected void onDraw(Canvas canvas) {
       // Draw the background...
-      Paint background = new Paint();
-      background.setColor(getResources().getColor(
-            R.color.puzzle_background));
+      //Paint background = new Paint();
+      background.setColor(getResources().getColor(R.color.puzzle_background));
       canvas.drawRect(0, 0, getWidth(), getHeight(), background);
 
       
       // Draw the board...
       
       // Define colors for the grid lines
-      Paint dark = new Paint();
+      //Paint dark = new Paint();
       dark.setColor(getResources().getColor(R.color.puzzle_dark));
 
-      Paint hilite = new Paint();
+      //Paint hilite = new Paint();
       hilite.setColor(getResources().getColor(R.color.puzzle_hilite));
 
-      Paint light = new Paint();
+      //Paint light = new Paint();
       light.setColor(getResources().getColor(R.color.puzzle_light));
 
       // Draw the minor grid lines
       for (int i = 0; i < 10; i++) {
           //ava beg
           if (i % 3 != 0) {
-              canvas.drawLine(offsetX + 0, offsetY + i * height, offsetX + fieldWidth, offsetY + i * height, light);
-              canvas.drawLine(offsetX + 0, offsetY + i * height + 1, offsetX + fieldWidth, offsetY + i * height + 1, hilite);
-              canvas.drawLine(offsetX + i * width, offsetY + 0, offsetX + i * width, offsetY + fieldHeight, light);
-              canvas.drawLine(offsetX + i * width + 1, offsetY + 0, offsetX + i * width + 1, offsetY + fieldHeight, hilite);
+              canvas.drawLine(offsetX, offsetY + i * height, offsetX + fieldWidth, offsetY + i * height, light);
+              canvas.drawLine(offsetX, offsetY + i * height + 1, offsetX + fieldWidth, offsetY + i * height + 1, hilite);
+              canvas.drawLine(offsetX + i * width, offsetY, offsetX + i * width, offsetY + fieldHeight, light);
+              canvas.drawLine(offsetX + i * width + 1, offsetY, offsetX + i * width + 1, offsetY + fieldHeight, hilite);
           } else {
-              canvas.drawLine(offsetX + 0, offsetY + i * height, offsetX + fieldWidth, offsetY + i * height, dark);
-              canvas.drawLine(offsetX + 0, offsetY + i * height + 1, offsetX + fieldWidth, offsetY + i * height + 1, hilite);
-              canvas.drawLine(offsetX + i * width, offsetY + 0, offsetX + i * width, offsetY + fieldHeight, dark);
-              canvas.drawLine(offsetX + i * width + 1, offsetY + 0, offsetX + i * width + 1, offsetY + fieldHeight, hilite);
+              canvas.drawLine(offsetX, offsetY + i * height, offsetX + fieldWidth, offsetY + i * height, dark);
+              canvas.drawLine(offsetX, offsetY + i * height + 1, offsetX + fieldWidth, offsetY + i * height + 1, hilite);
+              canvas.drawLine(offsetX + i * width, offsetY, offsetX + i * width, offsetY + fieldHeight, dark);
+              canvas.drawLine(offsetX + i * width + 1, offsetY, offsetX + i * width + 1, offsetY + fieldHeight, hilite);
           }
           //ava end
 //          canvas.drawLine(0,               i * height + 1, getWidth(), i * height + 1, hilite);
@@ -159,9 +167,8 @@ public class PuzzleView extends View {
 
       // Draw the numbers...
       // Define color and style for numbers
-      Paint foreground = new Paint(Paint.ANTI_ALIAS_FLAG);
-      foreground.setColor(getResources().getColor(
-            R.color.puzzle_foreground));
+      //Paint foreground = new Paint(Paint.ANTI_ALIAS_FLAG);
+      foreground.setColor(getResources().getColor(R.color.puzzle_foreground));
       foreground.setStyle(Style.FILL);
       foreground.setTextSize(height * 0.75f);
       foreground.setTextScaleX(width / height);
@@ -185,18 +192,18 @@ public class PuzzleView extends View {
          // Draw the hints...
          
          // Pick a hint color based on #moves left
-         Paint hint = new Paint();
+         //Paint hint = new Paint();
          int c[] = { getResources().getColor(R.color.puzzle_hint_0),
                getResources().getColor(R.color.puzzle_hint_1),
                getResources().getColor(R.color.puzzle_hint_2), };
-         Rect r = new Rect();
+         //Rect loc_r = new Rect();
          for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                int movesleft = 9 - game.getUsedTiles(i, j).length;
                if (movesleft < c.length) {
-                  getRect(i, j, r);
+                  getRect(i, j, loc_r);
                   hint.setColor(c[movesleft]);
-                  canvas.drawRect(r, hint);
+                  canvas.drawRect(loc_r, hint);
                }
             }
          }
@@ -206,7 +213,7 @@ public class PuzzleView extends View {
 
       // Draw the selection...
       Log.d(TAG, "selRect=" + selRect);
-      Paint selected = new Paint();
+      //Paint selected = new Paint();
       selected.setColor(getResources().getColor(
             R.color.puzzle_selected));
       canvas.drawRect(selRect, selected);
@@ -268,8 +275,7 @@ public class PuzzleView extends View {
       } else {
          // Number is not valid for this tile
          Log.d(TAG, "setSelectedTile: invalid: " + tile);
-         startAnimation(AnimationUtils.loadAnimation(game,
-               R.anim.shake));
+         startAnimation(AnimationUtils.loadAnimation(game, R.anim.shake));
       }
    }
 

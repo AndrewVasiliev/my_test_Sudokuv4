@@ -95,8 +95,7 @@ public class Game extends Activity {
       String puz;
       switch (diff) {
       case DIFFICULTY_CONTINUE:
-         puz = getPreferences(MODE_PRIVATE).getString(PREF_PUZZLE,
-               easyPuzzle);
+         puz = getPreferences(MODE_PRIVATE).getString(PREF_PUZZLE, easyPuzzle);
          break;
          // ...
          
@@ -171,8 +170,7 @@ public class Game extends Activity {
    protected void showKeypadOrError(int x, int y) {
       int tiles[] = getUsedTiles(x, y);
       if (tiles.length == 9) {
-         Toast toast = Toast.makeText(this,
-               R.string.no_moves_label, Toast.LENGTH_SHORT);
+         Toast toast = Toast.makeText(this, R.string.no_moves_label, Toast.LENGTH_SHORT);
          toast.setGravity(Gravity.CENTER, 0, 0);
          toast.show();
       } else {
