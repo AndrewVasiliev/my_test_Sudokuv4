@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.AnimationUtils;
 
 
@@ -46,6 +47,7 @@ public class PuzzleView extends View {
     private int offsetY;    //смещение по Y, для того чтобы поле было посередине
     private int fieldWidth; //ширина игрового поля в пикселях
     private int fieldHeight;//высота игрового поля в пикселях
+    private int fieldSize;  //размер игрового поля в клетках (поле всегда квадратное)
     //ava end
    private final Rect selRect = new Rect();
 
@@ -63,12 +65,15 @@ public class PuzzleView extends View {
    public PuzzleView(Context context) {
       
       super(context);
+
       this.game = (Game) context;
       setFocusable(true);
       setFocusableInTouchMode(true);
       
       // ...
-      setId(ID); 
+      //setId(ID)
+       fieldSize = this.game.getfieldSize();
+       Log.d(TAG, "fieldSize=" + fieldSize + "  this.game.locFieldSize=" + this.game.locFieldSize);
    }
 
    @Override
@@ -103,8 +108,8 @@ public class PuzzleView extends View {
        Log.d(TAG, "onSizeChanged: w " + w + ", h " + h);
        Log.d(TAG, "onSizeChanged: offsetX " + offsetX + ", offsetY " + offsetY);
 
-       width = fieldWidth / 9f;
-       height = fieldHeight / 9f;
+       width = fieldWidth / /*9f*/ (float) fieldSize;
+       height = fieldHeight / /*9f*/ (float) fieldSize;
        //ava end
 
 //      width = w / 9f;
@@ -135,16 +140,18 @@ public class PuzzleView extends View {
       light.setColor(getResources().getColor(R.color.puzzle_light));
 
       // Draw the minor grid lines
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < (fieldSize + 1); i++) {
           //ava beg
           if (i % 3 != 0) {
               canvas.drawLine(offsetX, offsetY + i * height, offsetX + fieldWidth, offsetY + i * height, light);
               canvas.drawLine(offsetX, offsetY + i * height + 1, offsetX + fieldWidth, offsetY + i * height + 1, hilite);
+
               canvas.drawLine(offsetX + i * width, offsetY, offsetX + i * width, offsetY + fieldHeight, light);
               canvas.drawLine(offsetX + i * width + 1, offsetY, offsetX + i * width + 1, offsetY + fieldHeight, hilite);
           } else {
               canvas.drawLine(offsetX, offsetY + i * height, offsetX + fieldWidth, offsetY + i * height, dark);
               canvas.drawLine(offsetX, offsetY + i * height + 1, offsetX + fieldWidth, offsetY + i * height + 1, hilite);
+
               canvas.drawLine(offsetX + i * width, offsetY, offsetX + i * width, offsetY + fieldHeight, dark);
               canvas.drawLine(offsetX + i * width + 1, offsetY, offsetX + i * width + 1, offsetY + fieldHeight, hilite);
           }
@@ -180,8 +187,8 @@ public class PuzzleView extends View {
       float x = width / 2;
       // Centering in Y: measure ascent/descent first
       float y = height / 2 - (fm.ascent + fm.descent) / 2;
-      for (int i = 0; i < 9; i++) {
-         for (int j = 0; j < 9; j++) {
+      for (int i = 0; i < fieldSize; i++) {
+         for (int j = 0; j < fieldSize; j++) {
             canvas.drawText(this.game.getTileString(i, j), offsetX + i
                   * width + x, offsetY + j * height + y, foreground);
          }
@@ -197,8 +204,8 @@ public class PuzzleView extends View {
                getResources().getColor(R.color.puzzle_hint_1),
                getResources().getColor(R.color.puzzle_hint_2), };
          //Rect loc_r = new Rect();
-         for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
+         for (int i = 0; i < fieldSize; i++) {
+            for (int j = 0; j < fieldSize; j++) {
                int movesleft = 9 - game.getUsedTiles(i, j).length;
                if (movesleft < c.length) {
                   getRect(i, j, loc_r);
@@ -281,8 +288,8 @@ public class PuzzleView extends View {
 
    private void select(int x, int y) {
       invalidate(selRect);
-      selX = Math.min(Math.max(x, 0), 8);
-      selY = Math.min(Math.max(y, 0), 8);
+      selX = Math.min(Math.max(x, 0), /*8*/ fieldSize-1);
+      selY = Math.min(Math.max(y, 0), /*8*/ fieldSize-1);
       getRect(selX, selY, selRect);
       invalidate(selRect);
    }
@@ -291,7 +298,10 @@ public class PuzzleView extends View {
       rect.set((int) (offsetX + x * width), (int) (offsetY + y * height),
               (int) (offsetX + x * width + width), (int) (offsetY + y * height + height));
    }
-   
+
+ /*   public void Initialization(int locFieldSize) {
+        fieldSize = locFieldSize;
+    }*/
    // ...
 }
 

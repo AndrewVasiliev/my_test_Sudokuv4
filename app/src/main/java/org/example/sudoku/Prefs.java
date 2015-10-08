@@ -8,7 +8,9 @@
 ***/
 package org.example.sudoku;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -24,7 +26,10 @@ public class Prefs extends PreferenceActivity {
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       addPreferencesFromResource(R.xml.settings);
+
    }
+
+
 
    
    /** Get the current value of the music option */

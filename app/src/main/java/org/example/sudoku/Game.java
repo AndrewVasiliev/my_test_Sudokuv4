@@ -13,14 +13,15 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Window;
 import android.widget.Toast;
 
 public class Game extends Activity {
    private static final String TAG = "Sudoku";
 
-   public static final String KEY_DIFFICULTY =
-      "org.example.sudoku.difficulty";
-   
+    public static final String KEY_DIFFICULTY = "org.example.sudoku.difficulty";
+    public static final String KEY_FIELDSIZE = "org.example.sudoku.fieldsize";
+
    private static final String PREF_PUZZLE = "puzzle" ;
    
    public static final int DIFFICULTY_EASY = 0;
@@ -28,9 +29,10 @@ public class Game extends Activity {
    public static final int DIFFICULTY_HARD = 2;
    
    protected static final int DIFFICULTY_CONTINUE = -1;
-   
 
-   private int puzzle[] = new int[9 * 9];
+    protected int locFieldSize;
+
+   private int puzzle[]; //= new int[ locFieldSize * locFieldSize];
 
    private final String easyPuzzle =
       "360000000004230800000004200" +
@@ -54,12 +56,18 @@ public class Game extends Activity {
       super.onCreate(savedInstanceState);
       Log.d(TAG, "onCreate");
 
-      int diff = getIntent().getIntExtra(KEY_DIFFICULTY,
-            DIFFICULTY_EASY);
+
+       locFieldSize = getIntent().getIntExtra(KEY_FIELDSIZE, 9);
+       Log.d(TAG, "Game.fieldSize=" + locFieldSize);
+
+       puzzle = new int[locFieldSize * locFieldSize];
+      int diff = getIntent().getIntExtra(KEY_DIFFICULTY, DIFFICULTY_EASY);
       puzzle = getPuzzle(diff);
       calculateUsedTiles();
+      requestWindowFeature(Window.FEATURE_NO_TITLE); //окно без заголовка
 
       puzzleView = new PuzzleView(this);
+      //puzzleView.Initialization (fieldSize);
       setContentView(puzzleView);
       puzzleView.requestFocus();
 
@@ -143,6 +151,10 @@ public class Game extends Activity {
       puzzle[y * 9 + x] = value;
    }
 
+    protected int getfieldSize() {
+        return (locFieldSize);
+    }
+
    /** Return a string for the tile at the given coordinates */
    protected String getTileString(int x, int y) {
       int v = getTile(x, y);
@@ -180,15 +192,15 @@ public class Game extends Activity {
       }
    }
 
-   /** Cache of used tiles */
+   //** Cache of used tiles *
    private final int used[][][] = new int[9][9][];
 
-   /** Return cached used tiles visible from the given coords */
+   //** Return cached used tiles visible from the given coords *
    protected int[] getUsedTiles(int x, int y) {
       return used[x][y];
    }
 
-   /** Compute the two dimensional array of used tiles */
+   //** Compute the two dimensional array of used tiles *
    private void calculateUsedTiles() {
       for (int x = 0; x < 9; x++) {
          for (int y = 0; y < 9; y++) {

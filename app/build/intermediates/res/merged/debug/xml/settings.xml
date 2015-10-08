@@ -13,7 +13,7 @@
       android:key="music"
       android:title="@string/music_title"
       android:summary="@string/music_summary"
-      android:defaultValue="true" />
+      android:defaultValue="false" />
    <CheckBoxPreference
       android:key="hints"
       android:title="@string/hints_title"
