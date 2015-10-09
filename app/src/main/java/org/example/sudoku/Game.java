@@ -16,6 +16,9 @@ import android.view.Gravity;
 import android.view.Window;
 import android.widget.Toast;
 
+import java.util.Arrays;
+import java.util.Random;
+
 public class Game extends Activity {
    private static final String TAG = "Sudoku";
 
@@ -34,7 +37,7 @@ public class Game extends Activity {
 
    private int puzzle[]; //= new int[ locFieldSize * locFieldSize];
 
-   private final String easyPuzzle =
+/*   private final String easyPuzzle =
       "360000000004230800000004200" +
       "070460003820000014500013020" +
       "001900000007048300000000045";
@@ -46,7 +49,7 @@ public class Game extends Activity {
       "009000000080605020501078000" +
       "000000700706040102004000000" +
       "000720903090301080000000600";
-
+*/
    private PuzzleView puzzleView;
 
    
@@ -61,9 +64,9 @@ public class Game extends Activity {
        Log.d(TAG, "Game.fieldSize=" + locFieldSize);
 
        puzzle = new int[locFieldSize * locFieldSize];
-      int diff = getIntent().getIntExtra(KEY_DIFFICULTY, DIFFICULTY_EASY);
-      puzzle = getPuzzle(diff);
-      calculateUsedTiles();
+      //int diff = getIntent().getIntExtra(KEY_DIFFICULTY, DIFFICULTY_EASY);
+      puzzle = getPuzzle(locFieldSize);
+//      calculateUsedTiles();
       requestWindowFeature(Window.FEATURE_NO_TITLE); //окно без заголовка
 
       puzzleView = new PuzzleView(this);
@@ -99,11 +102,66 @@ public class Game extends Activity {
    
    
    /** Given a difficulty level, come up with a new puzzle */
-   private int[] getPuzzle(int diff) {
-      String puz;
-      switch (diff) {
+   private int[] getPuzzle(int fs) {
+      int[] puz;
+      int count,        //количество повторений в поле для каждого значения (1,2,3,4,5,6,7,8,9)
+              step,     //случайный шаг для заполнения следующей позиции значением
+              currPos,  //текущая позиция
+              maxIndex, //максимальная позиция в массиве
+              posLeft = 0;  //количество оставшихся незаполненных позиций
+      Random locRandom = new Random();
+
+      puz = new int[fs*fs];
+      currPos = 0;
+      maxIndex = fs*fs - 1;
+      Arrays.fill(puz, ' ');
+      puz[maxIndex/2] = 0;
+      count = (fs*fs) / 9;
+
+      //перебираем все значения для игрового поля (1..9)
+      for (int val = 1; val<10; val++) {
+         int maxcount = count;
+/*         if (val<6) {
+            //значений 1..5 будет немного больше чем 6..9
+            maxcount ++;
+         }
+ */
+         //распологаем случейным образом значение VAL в количестве MAXCOUNT штук на игровом поле
+         for (int j=0; j<maxcount; j++) {
+            posLeft = 0;
+            step = locRandom.nextInt(maxIndex)+1;
+            int k = currPos;
+            while (true) {
+               k++;
+               if ( k > maxIndex) {
+                  k = 0;
+               }
+               if ((k == currPos) && (posLeft == 0)) {
+                  //мы прошли по кругу и пустых мест уже нет. все заполнено.
+                  break;
+               }
+               if (puz[k] == ' ') {
+                  posLeft ++;
+                  step --;
+                  if (step == 0) {
+                     //помещаем на поле значение
+                     puz[k] = val ;
+                     currPos = k;
+                     break;
+                  }
+               }
+            }
+
+         }
+         if (posLeft == 0) {
+            //все поле заполнено. выходим.
+            break;
+         }
+      }
+/*
+      switch (fs) {
       case DIFFICULTY_CONTINUE:
-         puz = getPreferences(MODE_PRIVATE).getString(PREF_PUZZLE, easyPuzzle);
+         puz = getPreferences(MODE_PRIVATE).getString(PREF_PUZZLE, "");
          break;
          // ...
          
@@ -120,6 +178,8 @@ public class Game extends Activity {
          
       }
       return fromPuzzleString(puz);
+*/
+      return puz;
    }
    
 
@@ -143,12 +203,12 @@ public class Game extends Activity {
 
    /** Return the tile at the given coordinates */
    private int getTile(int x, int y) {
-      return puzzle[y * 9 + x];
+      return puzzle[y * locFieldSize + x];
    }
 
    /** Change the tile at the given coordinates */
    private void setTile(int x, int y, int value) {
-      puzzle[y * 9 + x] = value;
+      puzzle[y * locFieldSize + x] = value;
    }
 
     protected int getfieldSize() {
@@ -193,7 +253,7 @@ public class Game extends Activity {
    }
 
    //** Cache of used tiles *
-   private final int used[][][] = new int[9][9][];
+   private final int used[][][] = new int[locFieldSize][locFieldSize][];
 
    //** Return cached used tiles visible from the given coords *
    protected int[] getUsedTiles(int x, int y) {
@@ -202,8 +262,8 @@ public class Game extends Activity {
 
    //** Compute the two dimensional array of used tiles *
    private void calculateUsedTiles() {
-      for (int x = 0; x < 9; x++) {
-         for (int y = 0; y < 9; y++) {
+      for (int x = 0; x < locFieldSize; x++) {
+         for (int y = 0; y < locFieldSize; y++) {
             used[x][y] = calculateUsedTiles(x, y);
             // Log.d(TAG, "used[" + x + "][" + y + "] = "
             // + toPuzzleString(used[x][y]));
@@ -213,9 +273,9 @@ public class Game extends Activity {
 
    /** Compute the used tiles visible from this position */
    private int[] calculateUsedTiles(int x, int y) {
-      int c[] = new int[9];
+      int c[] = new int[locFieldSize];
       // horizontal
-      for (int i = 0; i < 9; i++) {
+      for (int i = 0; i < locFieldSize; i++) {
          if (i == y)
             continue;
          int t = getTile(x, i);
@@ -223,7 +283,7 @@ public class Game extends Activity {
             c[t - 1] = t;
       }
       // vertical
-      for (int i = 0; i < 9; i++) {
+      for (int i = 0; i < locFieldSize; i++) {
          if (i == x)
             continue;
          int t = getTile(i, y);

@@ -195,7 +195,7 @@ public class PuzzleView extends View {
       }
 
       
-      if (Prefs.getHints(getContext())) {
+ /*     if (Prefs.getHints(getContext())) {
          // Draw the hints...
          
          // Pick a hint color based on #moves left
@@ -216,7 +216,7 @@ public class PuzzleView extends View {
          }
          
       }
-      
+   */
 
       // Draw the selection...
       Log.d(TAG, "selRect=" + selRect);
