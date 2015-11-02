@@ -19,4 +19,4 @@
       android:title="@string/hints_title"
       android:summary="@string/hints_summary"
       android:defaultValue="true" />
-</PreferenceScreen><!-- From: file:/C:/Android/Projects/Sudokuv4_AS/app/src/main/res/xml/settings.xml -->
+</PreferenceScreen><!-- From: file:/C:/Android/Projects/my_test_Sudokuv4/app/src/main/res/xml/settings.xml -->

@@ -47,4 +47,4 @@
          android:layout_height="wrap_content"
          android:text="@string/exit_label" />
    </LinearLayout>
-</LinearLayout><!-- From: file:/C:/Android/Projects/Sudokuv4_AS/app/src/main/res/layout/main.xml -->
+</LinearLayout><!-- From: file:/C:/Android/Projects/my_test_Sudokuv4/app/src/main/res/layout/main.xml -->

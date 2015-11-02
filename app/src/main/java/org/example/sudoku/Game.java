@@ -36,7 +36,14 @@ public class Game extends Activity {
     protected int locFieldSize;
 
    private int puzzle[]; //= new int[ locFieldSize * locFieldSize];
-
+   public boolean vertical_move; //true - игрок должен выбрать ячейку по вертикали; false - по горизонтали
+   public int current_position; //текущая координата на поле. если vertical_move = true, то горизонтальная позиция столбца. если vertical_move = false, то вертикальная позиция строки.
+   public int current_player; //игрок, который должен сделать ход
+   public class StructPlayers {
+      String name;   //имя игрока
+      int points;    //набранные очки
+   }
+   public StructPlayers players[] = new StructPlayers[2];
 /*   private final String easyPuzzle =
       "360000000004230800000004200" +
       "070460003820000014500013020" +
@@ -64,8 +71,24 @@ public class Game extends Activity {
        Log.d(TAG, "Game.fieldSize=" + locFieldSize);
 
        puzzle = new int[locFieldSize * locFieldSize];
+     // players = new StructPlayers[2];
+      players[0] = new StructPlayers();
+      players[1] = new StructPlayers();
       //int diff = getIntent().getIntExtra(KEY_DIFFICULTY, DIFFICULTY_EASY);
-      puzzle = getPuzzle(locFieldSize);
+      //если активити было пересоздано (поворот экрана), то восстанавливаем состояние поля
+      if (savedInstanceState != null) {
+         //puzzle = fromPuzzleString(getPreferences(MODE_PRIVATE).getString(PREF_PUZZLE, ""));
+         LoadCurrentStatus();
+      } else {
+         puzzle = getPuzzle(locFieldSize);
+         vertical_move = true;
+         current_position = (locFieldSize - 1)/2;
+         players[0].name = "Player 1";
+         players[0].points = 0;
+         players[1].name = "Player 2";
+         players[1].points = 0;
+         current_player = 0;
+      }
 //      calculateUsedTiles();
       requestWindowFeature(Window.FEATURE_NO_TITLE); //окно без заголовка
 
@@ -87,7 +110,45 @@ public class Game extends Activity {
       Music.play(this, R.raw.game);
    }
 
-   
+   private void LoadCurrentStatus(){
+      puzzle = fromPuzzleString(getPreferences(MODE_PRIVATE).getString(PREF_PUZZLE, ""));
+
+      players[0].name = getPreferences(MODE_PRIVATE).getString(PREF_PUZZLE + "pl1_Name", "No data :(");
+      players[0].points = getPreferences(MODE_PRIVATE).getInt(PREF_PUZZLE + "pl1_Points", -1);
+      players[1].name = getPreferences(MODE_PRIVATE).getString(PREF_PUZZLE + "pl2_Name", "No data :(");
+      players[1].points = getPreferences(MODE_PRIVATE).getInt(PREF_PUZZLE + "pl2_Points", -1);
+
+      vertical_move = getPreferences(MODE_PRIVATE).getBoolean(PREF_PUZZLE + "vertical_move", false);
+      current_position = getPreferences(MODE_PRIVATE).getInt(PREF_PUZZLE + "current_position", 0);
+      current_player = getPreferences(MODE_PRIVATE).getInt(PREF_PUZZLE + "current_player", 0);
+   }
+
+   private void SaveCurrentStatus(){
+      getPreferences(MODE_PRIVATE)
+              .edit()
+              .putString(PREF_PUZZLE, toPuzzleString(puzzle))
+              .putString(PREF_PUZZLE + "pl1_Name", players[0].name)
+              .putInt(PREF_PUZZLE + "pl1_Points", players[0].points)
+              .putString(PREF_PUZZLE + "pl2_Name", players[1].name)
+              .putInt(PREF_PUZZLE + "pl2_Points", players[1].points)
+              .putBoolean(PREF_PUZZLE + "vertical_move", vertical_move)
+              .putInt(PREF_PUZZLE + "current_position", current_position)
+              .putInt(PREF_PUZZLE + "current_player", current_player)
+              .commit();
+      //getPreferences(MODE_PRIVATE).edit().putInt(PREF_PUZZLE + "pl1Points", players[0].points).commit();
+   }
+
+
+   @Override
+   protected void onSaveInstanceState(Bundle outState) {
+      super.onSaveInstanceState(outState);
+      //ava
+      // Save the current puzzle
+      //getPreferences(MODE_PRIVATE).edit().putString(PREF_PUZZLE, toPuzzleString(puzzle)).commit();
+      SaveCurrentStatus();
+   }
+
+
    @Override
    protected void onPause() {
       super.onPause();
@@ -95,12 +156,12 @@ public class Game extends Activity {
       Music.stop(this);
 
       // Save the current puzzle
-      getPreferences(MODE_PRIVATE).edit().putString(PREF_PUZZLE,
-            toPuzzleString(puzzle)).commit();
+      //getPreferences(MODE_PRIVATE).edit().putString(PREF_PUZZLE, toPuzzleString(puzzle)).commit();
+      SaveCurrentStatus();
    }
-   
-   
-   
+
+
+
    /** Given a difficulty level, come up with a new puzzle */
    private int[] getPuzzle(int fs) {
       int[] puz;
@@ -109,6 +170,8 @@ public class Game extends Activity {
               currPos,  //текущая позиция
               maxIndex, //максимальная позиция в массиве
               posLeft = 0;  //количество оставшихся незаполненных позиций
+
+
       Random locRandom = new Random();
 
       puz = new int[fs*fs];
@@ -119,15 +182,14 @@ public class Game extends Activity {
       count = (fs*fs) / 9;
 
       //перебираем все значения для игрового поля (1..9)
-      for (int val = 1; val<10; val++) {
-         int maxcount = count;
-/*         if (val<6) {
-            //значений 1..5 будет немного больше чем 6..9
-            maxcount ++;
-         }
- */
-         //распологаем случейным образом значение VAL в количестве MAXCOUNT штук на игровом поле
-         for (int j=0; j<maxcount; j++) {
+      int val = 0;
+      while (true) {
+          val++;
+          if (val == 10) {
+              val = 1;
+          }
+
+         //распологаем случайным образом значение VAL на игровом поле
             posLeft = 0;
             step = locRandom.nextInt(maxIndex)+1;
             int k = currPos;
@@ -152,7 +214,6 @@ public class Game extends Activity {
                }
             }
 
-         }
          if (posLeft == 0) {
             //все поле заполнено. выходим.
             break;
@@ -238,9 +299,25 @@ public class Game extends Activity {
       return true;
    }
 
+   private boolean CheckEndGame () {
+      int count = 0;
+      for (int i = 0; i < locFieldSize; i++) {
+         if (vertical_move) {
+            if (getTile(current_position, i) != 0)
+               count++;
+         } else {
+            if (getTile(i, current_position) != 0)
+               count++;
+         }
+      }
+      if (count>0)
+         return false;
+      return true;
+   }
+
    /** Open the keypad if there are any valid moves */
-   protected void showKeypadOrError(int x, int y) {
-      int tiles[] = getUsedTiles(x, y);
+   protected boolean showKeypadOrError(int x, int y) {
+/*      int tiles[] = getUsedTiles(x, y);
       if (tiles.length == 9) {
          Toast toast = Toast.makeText(this, R.string.no_moves_label, Toast.LENGTH_SHORT);
          toast.setGravity(Gravity.CENTER, 0, 0);
@@ -250,6 +327,33 @@ public class Game extends Activity {
          Dialog v = new Keypad(this, tiles, puzzleView);
          v.show();
       }
+      */
+      if (getTile(x, y) == 0) {
+         //пустая ячейка
+         Toast toast = Toast.makeText(this, R.string.no_moves_label, Toast.LENGTH_SHORT);
+         toast.setGravity(Gravity.CENTER, 0, 0);
+         toast.show();
+         return false;
+      } else {
+         players[current_player].points += getTile(x, y);
+         setTile(x,y, 0);
+         if (vertical_move) {
+            current_position = y;
+         } else {
+            current_position = x;
+         }
+         vertical_move = !vertical_move;
+         current_player ^= 1;
+
+         //проверяем возможность дальнейшей игры
+         if (CheckEndGame()) {
+            Toast toast = Toast.makeText(this, R.string.end_game, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+         }
+
+      }
+      return true;
    }
 
    //** Cache of used tiles *

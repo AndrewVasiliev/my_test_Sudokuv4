@@ -20,14 +20,16 @@ public final class R {
     public static final class color {
         public static final int background=0x7f080000;
         public static final int puzzle_background=0x7f080001;
-        public static final int puzzle_dark=0x7f080002;
-        public static final int puzzle_foreground=0x7f080003;
-        public static final int puzzle_hilite=0x7f080004;
-        public static final int puzzle_hint_0=0x7f080005;
-        public static final int puzzle_hint_1=0x7f080006;
-        public static final int puzzle_hint_2=0x7f080007;
-        public static final int puzzle_light=0x7f080008;
-        public static final int puzzle_selected=0x7f080009;
+        public static final int puzzle_currentmove=0x7f080002;
+        public static final int puzzle_currentplayer=0x7f080003;
+        public static final int puzzle_dark=0x7f080004;
+        public static final int puzzle_foreground=0x7f080005;
+        public static final int puzzle_hilite=0x7f080006;
+        public static final int puzzle_hint_0=0x7f080007;
+        public static final int puzzle_hint_1=0x7f080008;
+        public static final int puzzle_hint_2=0x7f080009;
+        public static final int puzzle_light=0x7f08000a;
+        public static final int puzzle_selected=0x7f08000b;
     }
     public static final class drawable {
         public static final int icon=0x7f020000;
@@ -69,22 +71,23 @@ public final class R {
         public static final int app_name=0x7f090003;
         public static final int continue_label=0x7f090004;
         public static final int easy_label=0x7f090005;
-        public static final int exit_label=0x7f090006;
-        public static final int game_title=0x7f090007;
-        public static final int hard_label=0x7f090008;
-        public static final int hints_summary=0x7f090009;
-        public static final int hints_title=0x7f09000a;
-        public static final int keypad_title=0x7f09000b;
-        public static final int main_title=0x7f09000c;
-        public static final int medium_label=0x7f09000d;
-        public static final int music_summary=0x7f09000e;
-        public static final int music_title=0x7f09000f;
-        public static final int new_game_label=0x7f090010;
-        public static final int new_game_title=0x7f090011;
-        public static final int no_moves_label=0x7f090012;
-        public static final int settings_label=0x7f090013;
-        public static final int settings_shortcut=0x7f090014;
-        public static final int settings_title=0x7f090015;
+        public static final int end_game=0x7f090006;
+        public static final int exit_label=0x7f090007;
+        public static final int game_title=0x7f090008;
+        public static final int hard_label=0x7f090009;
+        public static final int hints_summary=0x7f09000a;
+        public static final int hints_title=0x7f09000b;
+        public static final int keypad_title=0x7f09000c;
+        public static final int main_title=0x7f09000d;
+        public static final int medium_label=0x7f09000e;
+        public static final int music_summary=0x7f09000f;
+        public static final int music_title=0x7f090010;
+        public static final int new_game_label=0x7f090011;
+        public static final int new_game_title=0x7f090012;
+        public static final int no_moves_label=0x7f090013;
+        public static final int settings_label=0x7f090014;
+        public static final int settings_shortcut=0x7f090015;
+        public static final int settings_title=0x7f090016;
     }
     public static final class xml {
         public static final int settings=0x7f050000;

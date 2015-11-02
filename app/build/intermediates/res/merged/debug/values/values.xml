@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Android/Projects/Sudokuv4_AS/app/src/main/res/values/arrays.xml -->
+    <!-- From: file:/C:/Android/Projects/my_test_Sudokuv4/app/src/main/res/values/arrays.xml -->
     <eat-comment/>
     <array name="difficulty">
       <item>@string/easy_label</item>
       <item>@string/medium_label</item>
       <item>@string/hard_label</item>
    </array>
-    <!-- From: file:/C:/Android/Projects/Sudokuv4_AS/app/src/main/res/values/colors.xml -->
+    <!-- From: file:/C:/Android/Projects/my_test_Sudokuv4/app/src/main/res/values/colors.xml -->
     <eat-comment/>
     <color name="background">#3500ffff</color>
     <color name="puzzle_background">#ffe6f0ff</color>
+    <color name="puzzle_currentmove">#bb3cff00</color>
+    <color name="puzzle_currentplayer">#bb00ffa1</color>
     <color name="puzzle_dark">#6456648f</color>
     <color name="puzzle_foreground">#ff000000</color>
     <color name="puzzle_hilite">#ffffffff</color>
@@ -19,7 +21,7 @@
     <color name="puzzle_hint_2">#2000ff80</color>
     <color name="puzzle_light">#64c6d4ef</color>
     <color name="puzzle_selected">#64ff8000</color>
-    <!-- From: file:/C:/Android/Projects/Sudokuv4_AS/app/src/main/res/values/strings.xml -->
+    <!-- From: file:/C:/Android/Projects/my_test_Sudokuv4/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="about_label">About</string>
     <string name="about_text">\
@@ -34,6 +36,7 @@ row, each column, and each of the 3x3 boxes
     <string name="app_name">Sudoku</string>
     <string name="continue_label">Continue</string>
     <string name="easy_label">Easy</string>
+    <string name="end_game">End Game</string>
     <string name="exit_label">Exit</string>
     <string name="game_title">Game</string>
     <string name="hard_label">Hard</string>
@@ -46,7 +49,7 @@ row, each column, and each of the 3x3 boxes
     <string name="music_title">Music</string>
     <string name="new_game_label">New Game</string>
     <string name="new_game_title">Difficulty</string>
-    <string name="no_moves_label">No moves</string>
+    <string name="no_moves_label">Empty cell</string>
     <string name="settings_label">Settings...</string>
     <string name="settings_shortcut">s</string>
     <string name="settings_title">Sudoku settings</string>

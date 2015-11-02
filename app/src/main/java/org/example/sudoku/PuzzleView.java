@@ -48,6 +48,10 @@ public class PuzzleView extends View {
     private int fieldWidth; //ширина игрового поля в пикселях
     private int fieldHeight;//высота игрового поля в пикселях
     private int fieldSize;  //размер игрового поля в клетках (поле всегда квадратное)
+
+    private int plr_coor[] = new int [2];   //координаты по Х для отображения имен игроков и заработанных очков
+    private int plr_height; //высота текста имен игроков и заработанных очков
+    private int plr_width;  //ширина полей для имен и очков
     //ava end
    private final Rect selRect = new Rect();
 
@@ -57,6 +61,7 @@ public class PuzzleView extends View {
     private Paint light = new Paint();
     private Paint foreground = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint hint = new Paint();
+    private Paint currPlayer = new Paint();
     private Rect loc_r = new Rect();
     private Paint selected = new Paint();
 
@@ -102,6 +107,7 @@ public class PuzzleView extends View {
        fieldWidth  = w < h ? w : h;
        fieldHeight = w < h ? w : h;
 
+
        offsetX = ((w - fieldWidth) / 2);
        offsetY = ((h - fieldHeight) / 2);
 
@@ -110,6 +116,22 @@ public class PuzzleView extends View {
 
        width = fieldWidth / /*9f*/ (float) fieldSize;
        height = fieldHeight / /*9f*/ (float) fieldSize;
+
+       //имена игроков и заработанные очки
+       plr_height = (int) height /2;
+       if (offsetY < plr_height) {
+           //альбом
+           plr_width = (int)((w - fieldWidth) /2 );
+           plr_coor[0] = 0;
+           plr_coor[1] = w - plr_width;
+
+       } else {
+           //портрет
+           plr_width = (int)(w /5 * 2);
+           plr_coor[0] = 0;
+           plr_coor[1] = w - plr_width;
+       }
+
        //ava end
 
 //      width = w / 9f;
@@ -142,19 +164,13 @@ public class PuzzleView extends View {
       // Draw the minor grid lines
       for (int i = 0; i < (fieldSize + 1); i++) {
           //ava beg
-          if (i % 3 != 0) {
-              canvas.drawLine(offsetX, offsetY + i * height, offsetX + fieldWidth, offsetY + i * height, light);
-              canvas.drawLine(offsetX, offsetY + i * height + 1, offsetX + fieldWidth, offsetY + i * height + 1, hilite);
-
-              canvas.drawLine(offsetX + i * width, offsetY, offsetX + i * width, offsetY + fieldHeight, light);
-              canvas.drawLine(offsetX + i * width + 1, offsetY, offsetX + i * width + 1, offsetY + fieldHeight, hilite);
-          } else {
+//          if (i % 3 != 0) {
               canvas.drawLine(offsetX, offsetY + i * height, offsetX + fieldWidth, offsetY + i * height, dark);
               canvas.drawLine(offsetX, offsetY + i * height + 1, offsetX + fieldWidth, offsetY + i * height + 1, hilite);
 
               canvas.drawLine(offsetX + i * width, offsetY, offsetX + i * width, offsetY + fieldHeight, dark);
               canvas.drawLine(offsetX + i * width + 1, offsetY, offsetX + i * width + 1, offsetY + fieldHeight, hilite);
-          }
+//          }
           //ava end
 //          canvas.drawLine(0,               i * height + 1, getWidth(), i * height + 1, hilite);
 //          canvas.drawLine(0,               i * height, getWidth(), i * height, /*light*/ dark);
@@ -171,6 +187,19 @@ public class PuzzleView extends View {
 //         canvas.drawLine(i * width, 0, i * width, getHeight(), dark);
 //         canvas.drawLine(i * width + 1, 0, i * width + 1, getHeight(), hilite);
  //     }
+
+       //выделяем столбец или строку для очередного хода
+       for (int i = 0; i< fieldSize; i++) {
+           if (this.game.vertical_move) {
+               getRect(this.game.current_position, i, loc_r);
+           } else {
+               getRect(i, this.game.current_position, loc_r);
+           }
+           hint.setColor(getResources().getColor(R.color.puzzle_currentmove));
+           canvas.drawRect(loc_r, hint);
+       }
+
+
 
       // Draw the numbers...
       // Define color and style for numbers
@@ -194,7 +223,31 @@ public class PuzzleView extends View {
          }
       }
 
-      
+       //выделяем цветом игрока, который должен сделать ход
+       loc_r.set(plr_coor[this.game.current_player], 0, plr_coor[this.game.current_player] + plr_width, plr_height);
+       currPlayer.setColor(getResources().getColor(R.color.puzzle_currentplayer));
+       canvas.drawRect(loc_r, currPlayer);
+
+       //рисуем имена игроков и набранный очки
+       foreground.setColor(getResources().getColor(R.color.puzzle_foreground));
+       foreground.setStyle(Style.FILL);
+       foreground.setTextSize(plr_height * 0.8f);
+       //foreground.setTextScaleX(width / height);
+       foreground.setTextAlign(Paint.Align.CENTER);
+
+       // Draw the number in the center of the tile
+       fm = foreground.getFontMetrics();
+       // Centering in X: use alignment (and X at midpoint)
+       x = plr_width / 2;
+       // Centering in Y: measure ascent/descent first
+       y = plr_height / 2 - (fm.ascent + fm.descent) / 2;
+       for (int j = 0; j < 2; j++) {
+           canvas.drawText(this.game.players[j].name, plr_coor[j] + x, 0 + y, foreground);
+           canvas.drawText(String.valueOf(this.game.players[j].points), plr_coor[j] + x, 0 + plr_height + y, foreground);
+       }
+
+
+
  /*     if (Prefs.getHints(getContext())) {
          // Draw the hints...
          
@@ -221,8 +274,7 @@ public class PuzzleView extends View {
       // Draw the selection...
       Log.d(TAG, "selRect=" + selRect);
       //Paint selected = new Paint();
-      selected.setColor(getResources().getColor(
-            R.color.puzzle_selected));
+      selected.setColor(getResources().getColor(R.color.puzzle_selected));
       canvas.drawRect(selRect, selected);
    }
 
@@ -231,10 +283,21 @@ public class PuzzleView extends View {
       if (event.getAction() != MotionEvent.ACTION_DOWN)
           return super.onTouchEvent(event);
 
-       select((int) ((event.getX() - offsetX) / width),
-               (int) ((event.getY() - offsetY) / height));
-       game.showKeypadOrError(selX, selY);
-      Log.d(TAG, "onTouchEvent: x " + selX + ", y " + selY);
+       int column = (int)((event.getX() - offsetX) / width);
+       int row = (int) ((event.getY() - offsetY) / height);
+       if ( (this.game.vertical_move && (column == this.game.current_position)) ||
+            (!this.game.vertical_move && (row == this.game.current_position)) ) {
+           select (column, row);
+           if (game.showKeypadOrError(selX, selY)) {
+               invalidate();
+           }
+       } else {
+           return true;
+       }
+
+       //select((int) ((event.getX() - offsetX) / width), (int) ((event.getY() - offsetY) / height));
+       //game.showKeypadOrError(selX, selY);
+       Log.d(TAG, "onTouchEvent: x " + selX + ", y " + selY);
       return true;
    }
 
@@ -255,17 +318,6 @@ public class PuzzleView extends View {
       case KeyEvent.KEYCODE_DPAD_RIGHT:
          select(selX + 1, selY);
          break;
-      case KeyEvent.KEYCODE_0:
-      case KeyEvent.KEYCODE_SPACE: setSelectedTile(0); break;
-      case KeyEvent.KEYCODE_1:     setSelectedTile(1); break;
-      case KeyEvent.KEYCODE_2:     setSelectedTile(2); break;
-      case KeyEvent.KEYCODE_3:     setSelectedTile(3); break;
-      case KeyEvent.KEYCODE_4:     setSelectedTile(4); break;
-      case KeyEvent.KEYCODE_5:     setSelectedTile(5); break;
-      case KeyEvent.KEYCODE_6:     setSelectedTile(6); break;
-      case KeyEvent.KEYCODE_7:     setSelectedTile(7); break;
-      case KeyEvent.KEYCODE_8:     setSelectedTile(8); break;
-      case KeyEvent.KEYCODE_9:     setSelectedTile(9); break;
       case KeyEvent.KEYCODE_ENTER:
       case KeyEvent.KEYCODE_DPAD_CENTER:
          game.showKeypadOrError(selX, selY);

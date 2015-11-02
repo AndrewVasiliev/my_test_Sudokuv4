@@ -11,4 +11,4 @@
    <item android:id="@+id/settings"
       android:title="@string/settings_label"
       android:alphabeticShortcut="@string/settings_shortcut" />
-</menu><!-- From: file:/C:/Android/Projects/Sudokuv4_AS/app/src/main/res/menu/menu.xml -->
+</menu><!-- From: file:/C:/Android/Projects/my_test_Sudokuv4/app/src/main/res/menu/menu.xml -->
